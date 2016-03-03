@@ -1,12 +1,15 @@
 import logging
 import argparse
 
+"""Lets see if this pops up on git"""
+
 #set the log output file and the log level
 logging.basicConfig(filename='snippets.log', level=logging.DEBUG)
 #filename indicates where you want loggin to be saved
 #The level argument sets the level
 
 #This is creating the program skeleton and inserting stubs for each one:
+
 
 def main():
     """Main function
