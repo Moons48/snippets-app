@@ -33,7 +33,9 @@ def main():
     put_parser.add_argument("name", help="Name of the snippet")
     put_parser.add_argument("snippet", help = "Snippet text")
     get_parser = subparsers.add_parser("get", help = "Retrieve a snippet")
-    get_parser.add_argument("name", help="Name of the snippet") #didnt have add argument
+    get_parser.add_argument("name", help="Name of the snippet") #didnt have add argument before!
+    show_parser = subparsers.add_parser("showall", help = "Shows all keywords in db")
+    show_parser.add_argument("keyword",help = "Enter keyword to see all items in column")
     
     arguments = parser.parse_args()
     arguments = vars(arguments)
@@ -44,6 +46,8 @@ def main():
     elif command == "get":
         snippet = get(**arguments)
         print("Retrieved snippet: %s"%(snippet))
+	elif command == "showall":
+		snippet = showall(**arguments)
         
 
 def put(name, snippet):
@@ -80,6 +84,15 @@ def get(name):
 
     logging.error("FIXME: Unimplemented - get({!r})".format(name))
     return name
+
+def showall(keyword):
+	global connection
+	with connection, connection.cursor() as cursor:
+		cursor.execute ("select %s from snippets",(keyword,))
+		for k in cursor:
+			print k
+		
+		
 
 if __name__ == "__main__":
     main()
