@@ -41,7 +41,6 @@ def main():
     
     if command == "put":
         name, snippet = put(**arguments)
-        print("Stored %s as %s")%(snippet, name)
     elif command == "get":
         snippet = get(**arguments)
         print("Retrieved snippet: %s"%(snippet))
@@ -50,9 +49,13 @@ def main():
 def put(name, snippet):
     global connection #Had to make connection global to work
     logging.info("Storing snippet %s: %s"%(name, snippet))
-    cursor = connection.cursor() #allow us to run sql commands in script
-    command = "insert into snippets values (%s, %s)" #these are sql commands
-    cursor.execute(command, (name, snippet)) #running command to the database
+    with connection, connection.cursor() as cursor: #allow us to run sql commands in a script
+    	command = "insert into snippets values (%s, %s)" #these are sql commands
+    	try:
+    		cursor.execute(command, (name, snippet)) #running command to the database
+    		print("Stored %s as %s")%(snippet, name)
+    	except:
+    		print ("The keyword %s already exists!")%(name)
     #?still not sure about why (name, snippet)???
     connection.commit()#save the changes to the database
     logging.debug("Snippet stored successfully.")
@@ -65,10 +68,12 @@ def put(name, snippet):
 def get(name):
     global connection
     logging.info("Retrieving snippet %s" %(name))
-    cursor = connection.cursor()
-    cursor.execute("select message from snippets where keyword = %s;", (name,)) #**always need a , They always need to be tuple
-    row = cursor.fetchone()
-    connection.commit()
+    with connection, connection.cursor() as cursor:
+		cursor.execute("select message from snippets where keyword = %s", (name,))
+		row = cursor.fetchone()
+    if not row:
+    	#No snippet was found
+    	return "404: Snippet not found"
     return row[0]
     logging.debug("Snippet retrieved successfully. I hope")
 
