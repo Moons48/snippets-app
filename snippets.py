@@ -33,6 +33,7 @@ def main():
     put_parser.add_argument("name", help="Name of the snippet")
     put_parser.add_argument("snippet", help = "Snippet text")
     get_parser = subparsers.add_parser("get", help = "Retrieve a snippet")
+    get_parser.add_argument("name", help="Name of the snippet") #didnt have add argument
     
     arguments = parser.parse_args()
     arguments = vars(arguments)
@@ -40,7 +41,7 @@ def main():
     
     if command == "put":
         name, snippet = put(**arguments)
-        print"Stored %s as %s"%(snippet, name)
+        print("Stored %s as %s")%(snippet, name)
     elif command == "get":
         snippet = get(**arguments)
         print("Retrieved snippet: %s"%(snippet))
@@ -65,9 +66,10 @@ def get(name):
     global connection
     logging.info("Retrieving snippet %s" %(name))
     cursor = connection.cursor()
-    command = "select message from snippets where keyword = %s"%(name)
-    cursor.fetchone(command, (name))
+    cursor.execute("select message from snippets where keyword = %s;", (name,)) #**always need a , They always need to be tuple
+    row = cursor.fetchone()
     connection.commit()
+    return row[0]
     logging.debug("Snippet retrieved successfully. I hope")
 
 
